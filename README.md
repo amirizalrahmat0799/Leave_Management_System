@@ -1,4 +1,4 @@
-# leave_management_system - php
+# Leave Management System - PHP
 This is my final year project, a web-based system to developed using php, JavaScript, jQuery and etc. The objective of this project to handle leave application requested by staff/user.
 
 # Installation
