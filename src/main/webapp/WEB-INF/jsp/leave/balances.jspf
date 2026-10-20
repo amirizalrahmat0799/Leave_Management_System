@@ -1,0 +1,14 @@
+<table class="grid">
+    <thead><tr><th>Leave type</th><th class="num">Entitled</th><th class="num">Taken</th><th class="num">Pending</th><th class="num">Available</th></tr></thead>
+    <tbody>
+    <s:iterator value="balances" var="b">
+        <tr>
+            <td><span class="code"><s:property value="#b.type.code"/></span> <s:property value="#b.type.name"/></td>
+            <td class="num"><s:property value="#b.entitledText"/></td>
+            <td class="num"><s:property value="#b.approvedText"/></td>
+            <td class="num"><s:property value="#b.pendingText"/></td>
+            <td class="num strong"><s:property value="#b.availableText"/></td>
+        </tr>
+    </s:iterator>
+    </tbody>
+</table>

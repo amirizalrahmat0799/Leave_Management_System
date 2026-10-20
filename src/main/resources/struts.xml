@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 6.0//EN"
+        "https://struts.apache.org/dtds/struts-6.0.dtd">
+<struts>
+    <constant name="struts.devMode" value="false"/>
+    <constant name="struts.action.extension" value="action"/>
+    <constant name="struts.ui.theme" value="simple"/>
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    <!-- Struts 7 only lets OGNL (the JSP tags) touch allowlisted classes: add this app's view objects -->
+    <constant name="struts.allowlist.packageNames"
+              value="com.ahmadamirizal.leave.model,com.ahmadamirizal.leave.dao,com.ahmadamirizal.leave.web,com.ahmadamirizal.leave.web.action"/>
+
+    <!-- Signing in and out: the only pages reachable without a session -->
+    <package name="public" namespace="/" extends="struts-default">
+        <action name="login" class="com.ahmadamirizal.leave.web.action.LoginAction">
+            <result name="input">/WEB-INF/jsp/login.jsp</result>
+            <result name="success" type="redirectAction">dashboard</result>
+        </action>
+
+        <action name="logout" class="com.ahmadamirizal.leave.web.action.LogoutAction">
+            <result name="success" type="redirectAction">login</result>
+        </action>
+    </package>
+
+    <!-- Everything for signed-in users. POST actions add the token interceptor (one-time form tokens). -->
+    <package name="app" namespace="/" extends="struts-default">
+        <interceptors>
+            <interceptor name="auth" class="com.ahmadamirizal.leave.web.interceptor.AuthInterceptor"/>
+            <interceptor name="role" class="com.ahmadamirizal.leave.web.interceptor.RoleInterceptor"/>
+            <interceptor-stack name="appStack">
+                <interceptor-ref name="auth"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+            <interceptor-stack name="appPostStack">
+                <interceptor-ref name="auth"/>
+                <interceptor-ref name="token"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+            <interceptor-stack name="hrStack">
+                <interceptor-ref name="auth"/>
+                <interceptor-ref name="role"><param name="roles">ADMIN,HR</param></interceptor-ref>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+            <interceptor-stack name="hrPostStack">
+                <interceptor-ref name="auth"/>
+                <interceptor-ref name="role"><param name="roles">ADMIN,HR</param></interceptor-ref>
+                <interceptor-ref name="token"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="appStack"/>
+
+        <global-results>
+            <!-- Redirects name the namespace, so they also work from /hr pages -->
+            <result name="login" type="redirectAction">
+                <param name="actionName">login</param>
+                <param name="namespace">/</param>
+            </result>
+            <result name="changePassword" type="redirectAction">
+                <param name="actionName">password</param>
+                <param name="namespace">/</param>
+            </result>
+            <!-- A form submitted twice, or a stale form: back to the dashboard instead of doing it again -->
+            <result name="invalid.token" type="redirectAction">
+                <param name="actionName">dashboard</param>
+                <param name="namespace">/</param>
+            </result>
+            <result name="forbidden">/WEB-INF/jsp/common/forbidden.jsp</result>
+            <result name="notFound">/WEB-INF/jsp/common/notfound.jsp</result>
+        </global-results>
+
+        <action name="dashboard" class="com.ahmadamirizal.leave.web.action.DashboardAction">
+            <result>/WEB-INF/jsp/dashboard.jsp</result>
+        </action>
+
+        <!-- My leave -->
+        <action name="my-leave" class="com.ahmadamirizal.leave.web.action.MyLeaveAction">
+            <result>/WEB-INF/jsp/leave/my-leave.jsp</result>
+        </action>
+        <action name="cancel-leave" class="com.ahmadamirizal.leave.web.action.MyLeaveAction" method="cancel">
+            <interceptor-ref name="appPostStack"/>
+            <result type="redirectAction">my-leave</result>
+        </action>
+        <action name="apply" class="com.ahmadamirizal.leave.web.action.ApplyLeaveAction" method="show">
+            <result name="input">/WEB-INF/jsp/leave/apply.jsp</result>
+        </action>
+        <action name="apply-submit" class="com.ahmadamirizal.leave.web.action.ApplyLeaveAction">
+            <interceptor-ref name="appPostStack"/>
+            <result name="input">/WEB-INF/jsp/leave/apply.jsp</result>
+            <result type="redirectAction">my-leave</result>
+        </action>
+
+        <!-- Approvals (HR, admins, and department approvers; checked in the action) -->
+        <action name="review" class="com.ahmadamirizal.leave.web.action.ReviewAction">
+            <result>/WEB-INF/jsp/leave/review.jsp</result>
+        </action>
+        <action name="review-view" class="com.ahmadamirizal.leave.web.action.ReviewAction" method="view">
+            <result>/WEB-INF/jsp/leave/review-view.jsp</result>
+        </action>
+        <action name="review-decide" class="com.ahmadamirizal.leave.web.action.ReviewAction" method="decide">
+            <interceptor-ref name="appPostStack"/>
+            <result type="redirectAction">review</result>
+        </action>
+
+        <!-- Account -->
+        <action name="password" class="com.ahmadamirizal.leave.web.action.PasswordAction" method="show">
+            <result name="input">/WEB-INF/jsp/account/password.jsp</result>
+        </action>
+        <action name="password-submit" class="com.ahmadamirizal.leave.web.action.PasswordAction">
+            <interceptor-ref name="appPostStack"/>
+            <result name="input">/WEB-INF/jsp/account/password.jsp</result>
+            <result type="redirectAction">dashboard</result>
+        </action>
+    </package>
+
+    <!-- HR and administrators -->
+    <package name="hr" namespace="/hr" extends="app">
+        <default-interceptor-ref name="hrStack"/>
+
+        <action name="employees" class="com.ahmadamirizal.leave.web.action.EmployeeAction">
+            <result>/WEB-INF/jsp/employee/list.jsp</result>
+        </action>
+        <action name="employee-edit" class="com.ahmadamirizal.leave.web.action.EmployeeAction" method="edit">
+            <result name="input">/WEB-INF/jsp/employee/edit.jsp</result>
+        </action>
+        <action name="employee-save" class="com.ahmadamirizal.leave.web.action.EmployeeAction" method="save">
+            <interceptor-ref name="hrPostStack"/>
+            <result name="input">/WEB-INF/jsp/employee/edit.jsp</result>
+            <result type="redirectAction">employees</result>
+        </action>
+        <action name="employee-reset-password" class="com.ahmadamirizal.leave.web.action.EmployeeAction" method="resetPassword">
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">employees</result>
+        </action>
+
+        <action name="departments" class="com.ahmadamirizal.leave.web.action.LookupAction">
+            <param name="kind">department</param>
+            <result>/WEB-INF/jsp/maintenance/lookup.jsp</result>
+        </action>
+        <action name="department-save" class="com.ahmadamirizal.leave.web.action.LookupAction" method="save">
+            <param name="kind">department</param>
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">departments</result>
+        </action>
+        <action name="department-delete" class="com.ahmadamirizal.leave.web.action.LookupAction" method="delete">
+            <param name="kind">department</param>
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">departments</result>
+        </action>
+        <action name="designations" class="com.ahmadamirizal.leave.web.action.LookupAction">
+            <param name="kind">designation</param>
+            <result>/WEB-INF/jsp/maintenance/lookup.jsp</result>
+        </action>
+        <action name="designation-save" class="com.ahmadamirizal.leave.web.action.LookupAction" method="save">
+            <param name="kind">designation</param>
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">designations</result>
+        </action>
+        <action name="designation-delete" class="com.ahmadamirizal.leave.web.action.LookupAction" method="delete">
+            <param name="kind">designation</param>
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">designations</result>
+        </action>
+
+        <action name="leave-types" class="com.ahmadamirizal.leave.web.action.LeaveTypeAction">
+            <result>/WEB-INF/jsp/maintenance/leave-types.jsp</result>
+        </action>
+        <action name="leave-type-save" class="com.ahmadamirizal.leave.web.action.LeaveTypeAction" method="save">
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">leave-types</result>
+        </action>
+
+        <action name="holidays" class="com.ahmadamirizal.leave.web.action.HolidayAction">
+            <result>/WEB-INF/jsp/maintenance/holidays.jsp</result>
+        </action>
+        <action name="holiday-add" class="com.ahmadamirizal.leave.web.action.HolidayAction" method="add">
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">
+                <param name="actionName">holidays</param>
+                <param name="year">${year}</param>
+            </result>
+        </action>
+        <action name="holiday-delete" class="com.ahmadamirizal.leave.web.action.HolidayAction" method="delete">
+            <interceptor-ref name="hrPostStack"/>
+            <result type="redirectAction">
+                <param name="actionName">holidays</param>
+                <param name="year">${year}</param>
+            </result>
+        </action>
+
+        <action name="report" class="com.ahmadamirizal.leave.web.action.ReportAction">
+            <result>/WEB-INF/jsp/report/report.jsp</result>
+        </action>
+        <action name="report-csv" class="com.ahmadamirizal.leave.web.action.ReportAction" method="csv"/>
+    </package>
+</struts>

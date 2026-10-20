@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${title}"/> · Leave Management System</title>
+    <link rel="stylesheet" href="${ctx}/css/app.css">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="${ctx}/dashboard.action">Leave<span>MS</span></a>
+    <s:if test="currentUser != null">
+        <nav>
+            <a href="${ctx}/dashboard.action">Dashboard</a>
+            <a href="${ctx}/my-leave.action">My leave</a>
+            <a href="${ctx}/apply.action">Apply</a>
+            <s:if test="currentUser.role.staffManager || currentUser.approver">
+                <a href="${ctx}/review.action">Approvals</a>
+            </s:if>
+            <s:if test="currentUser.role.staffManager">
+                <a href="${ctx}/hr/employees.action">Employees</a>
+                <span class="menu">
+                    <span class="menu-label">Settings</span>
+                    <span class="menu-items">
+                        <a href="${ctx}/hr/departments.action">Departments</a>
+                        <a href="${ctx}/hr/designations.action">Designations</a>
+                        <a href="${ctx}/hr/leave-types.action">Leave types</a>
+                        <a href="${ctx}/hr/holidays.action">Public holidays</a>
+                    </span>
+                </span>
+                <a href="${ctx}/hr/report.action">Report</a>
+            </s:if>
+        </nav>
+        <div class="who">
+            <s:property value="currentUser.fullName"/>
+            <span class="role"><s:property value="currentUser.role"/></span>
+            <a href="${ctx}/password.action">Password</a>
+            <a href="${ctx}/logout.action">Sign out</a>
+        </div>
+    </s:if>
+</header>
+<main>
+    <c:if test="${not empty sessionScope.flash}">
+        <div class="flash"><c:out value="${sessionScope.flash}"/></div>
+        <c:remove var="flash" scope="session"/>
+    </c:if>
+    <s:if test="hasActionErrors()">
+        <div class="errors"><s:actionerror/></div>
+    </s:if>
