@@ -1,0 +1,47 @@
+# Takes the README screenshots from the app running on Tomcat and MySQL, and uploads them as an artifact.
+# Runs when started by hand (Actions > Screenshots > Run workflow) and when this workflow or the script changes.
+name: Screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/screenshots.yml
+      - scripts/screenshots.mjs
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start MySQL and the app on Tomcat
+        run: docker compose up -d --build --wait
+      - name: Wait for the app
+        run: |
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8080/login.action && exit 0; sleep 2; done
+          exit 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Take screenshots
+        run: |
+          mkdir -p docs/images
+          node scripts/screenshots.mjs http://localhost:8080 docs/images
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: docs/images/*.png
+      - name: Logs
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop
+        if: always()
+        run: docker compose down -v
