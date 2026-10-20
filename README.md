@@ -68,8 +68,10 @@ All the people in the sample data are fictional.
 
 1. Create a MySQL database and run `src/main/resources/db/schema.sql`, then `sample-data.sql`.
 2. Copy the MySQL driver (`mysql-connector-j`) into Tomcat 10.1's `lib` folder.
-3. Set the connection in Tomcat's `bin/setenv.sh` (or `setenv.bat`), as in `docker/tomcat/setenv.sh`:
-   `-Dleave.db.url=jdbc:mysql://localhost:3306/leave_db -Dleave.db.user=... -Dleave.db.password=...`
+3. Copy `docker/tomcat/setenv.sh` into Tomcat's `bin` folder (on Windows, put the same `CATALINA_OPTS` lines in
+   `setenv.bat`), then set the environment variables `LEAVE_DB_URL` (for example
+   `jdbc:mysql://localhost:3306/leave_db?allowPublicKeyRetrieval=true&useSSL=false`), `LEAVE_DB_USER` and
+   `LEAVE_DB_PASSWORD`.
 4. `mvn package` and deploy `target/leave.war`.
 
 In IntelliJ IDEA, add a Tomcat 10.1 run configuration that deploys the project's "war exploded" artifact.

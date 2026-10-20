@@ -1,5 +1,7 @@
 #!/bin/sh
-# Passes the database settings from environment variables to context.xml (${leave.db.*}).
-CATALINA_OPTS="$CATALINA_OPTS -Dleave.db.url=${LEAVE_DB_URL} -Dleave.db.user=${LEAVE_DB_USER} -Dleave.db.password=${LEAVE_DB_PASSWORD}"
+# Lets context.xml read LEAVE_DB_URL, LEAVE_DB_USER and LEAVE_DB_PASSWORD straight from the environment.
+# They are deliberately not passed as -D options: catalina.sh evals CATALINA_OPTS, so the '&' in a JDBC URL
+# (or a '$' in a password) would be interpreted by the shell.
+CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.EnvironmentPropertySource"
 CATALINA_OPTS="$CATALINA_OPTS -Duser.timezone=Asia/Kuala_Lumpur"
 export CATALINA_OPTS

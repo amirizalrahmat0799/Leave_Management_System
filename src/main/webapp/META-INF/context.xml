@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  The connection pool Tomcat creates for the app. The ${...} values come from Java system properties
-  (set in docker/tomcat/setenv.sh from environment variables), so no password is stored here.
+  The connection pool Tomcat creates for the app. The ${...} values are environment variables
+  (Tomcat reads them because docker/tomcat/setenv.sh enables EnvironmentPropertySource), so no password is stored here.
   The MySQL driver lives in Tomcat's lib folder, as container-managed pools require.
 -->
 <Context>
     <Resource name="jdbc/leave" auth="Container" type="javax.sql.DataSource"
               driverClassName="com.mysql.cj.jdbc.Driver"
-              url="${leave.db.url}"
-              username="${leave.db.user}"
-              password="${leave.db.password}"
+              url="${LEAVE_DB_URL}"
+              username="${LEAVE_DB_USER}"
+              password="${LEAVE_DB_PASSWORD}"
               maxTotal="20" maxIdle="5" maxWaitMillis="10000"
               validationQuery="SELECT 1" testOnBorrow="true"/>
 </Context>
