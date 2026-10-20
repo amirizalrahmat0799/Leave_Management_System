@@ -1,7 +1,10 @@
 package com.ahmadamirizal.leave.dao;
 
 import java.math.BigDecimal;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import javax.sql.DataSource;
 
 /** Approved leave per department and month, for the report page and its CSV export. */
@@ -11,6 +14,7 @@ public class ReportDao extends JdbcDao {
         // JavaBean-style getters for the JSP tags
         public String getDepartment() { return department; }
         public int getMonth() { return month; }
+        public String getMonthName() { return Month.of(month).getDisplayName(TextStyle.FULL, Locale.ENGLISH); }
         public String getLeaveType() { return leaveType; }
         public String getDaysText() { return days.stripTrailingZeros().toPlainString(); }
         public int getApplications() { return applications; }

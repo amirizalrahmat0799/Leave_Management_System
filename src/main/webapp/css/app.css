@@ -87,7 +87,8 @@ button.link.danger { color: var(--bad); }
 .form button { align-self: flex-start; margin-top: .8rem; }
 .actions { display: flex; gap: .6rem; }
 form.inline { display: inline-flex; gap: .4rem; align-items: center; margin: 0; }
-form.inline input[type=text], form.inline input[type=search] { width: auto; }
+form.inline input[type=text] { width: auto; }
+form.inline input[type=search] { width: 16rem; }
 form.grow { display: flex; width: 100%; }
 form.grow .grow { flex: 1; }
 .inline-details { display: inline-block; margin-left: .6rem; }

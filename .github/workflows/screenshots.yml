@@ -1,5 +1,5 @@
 # Takes the README screenshots from the app running on Tomcat and MySQL, and uploads them as an artifact.
-# Runs when started by hand (Actions > Screenshots > Run workflow) and when this workflow or the script changes.
+# Runs when started by hand (Actions > Screenshots > Run workflow) and when the pages, this workflow or the script change.
 name: Screenshots
 
 on:
@@ -9,6 +9,7 @@ on:
     paths:
       - .github/workflows/screenshots.yml
       - scripts/screenshots.mjs
+      - src/main/webapp/**
 
 permissions:
   contents: read

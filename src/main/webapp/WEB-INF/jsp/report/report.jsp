@@ -17,7 +17,7 @@
     <s:iterator value="rows" var="r">
         <tr>
             <td><s:property value="#r.department"/></td>
-            <td><s:property value="#r.month"/></td>
+            <td><s:property value="#r.monthName"/></td>
             <td><span class="code"><s:property value="#r.leaveType"/></span></td>
             <td class="num"><s:property value="#r.daysText"/></td>
             <td class="num"><s:property value="#r.applications"/></td>

@@ -35,6 +35,15 @@
     </session-config>
 
     <!-- Views live under WEB-INF, so they can only be reached through an action -->
+    <!-- Read every JSP and included fragment as UTF-8 (fragments don't inherit the including page's pageEncoding) -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
