@@ -14,6 +14,8 @@ it as a classic Java enterprise web app, the kind many banks and government agen
 actions and JSPs on Tomcat, plain JDBC, MySQL**. It's "legacy" in style only: it runs on the current, supported
 Struts 7 and fixes the security problems version 1 had.
 
+![An employee's leave for the year: balances per leave type, a pending half day and two approved applications](docs/images/my-leave.png)
+
 ## Features
 
 - **One sign-in for everyone**, with three roles: employees, HR and administrators. Employees can also be
@@ -28,6 +30,20 @@ Struts 7 and fixes the security problems version 1 had.
 - **HR pages:** employees, departments, designations, leave types, public holidays, and a report of approved
   leave per department and month with a CSV download.
 - **Dashboard:** your balances, applications waiting for you, who's on leave today, and the next public holidays.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Dashboard of a department approver](docs/images/dashboard.png) | ![Approvals waiting for the IT department](docs/images/approvals.png) |
+| **Dashboard:** balances, applications waiting for you, who's away, coming holidays | **Approvals:** an approver only sees their own department |
+| ![Applying for leave next to the current balance](docs/images/apply.png) | ![HR's list of employees](docs/images/employees.png) |
+| **Apply:** the balance is shown beside the form | **Employees:** HR manages accounts, roles and approvers |
+| ![Approved leave per department and month](docs/images/report.png) | ![Sign-in page](docs/images/login.png) |
+| **Report:** approved leave per department and month, with a CSV download | **Sign in** |
+
+The screenshots are taken by the [Screenshots workflow](.github/workflows/screenshots.yml) from the app running on
+Tomcat and MySQL with the sample data.
 
 ## What changed from version 1
 
